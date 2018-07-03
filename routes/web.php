@@ -49,4 +49,18 @@ Route::group(['namespace' => 'Admin'], function () {
     });
 
     Route::get('/home','HomeController@index');
+
+    Route::group(['prefix'=>'m3gcn'],function(){
+        Route::get('/','M3gcnController@index');
+
+    });
+
+    Route::group(['prefix'=>'m3gvn'],function(){
+        Route::get('/','M3gcnController@index');
+
+    });
+
+
+
+
 });

@@ -27,10 +27,16 @@ class HomeController extends BaseController
      *
      */
     public function index(){
-        $products = Product::all();
-        dd($products);
+        $products = Product::all()->toArray();
+        if(empty($products)){
+            return response()->json(['msg'=>'暂无游戏产品','code'=>200]);
+        }
+        $result = [];
+        foreach ($products as $product){
+            $result[$product['category']][] = $product;
+        }
 
-        return view('admin.home');
+        return response()->json(['data'=>$result,'code'=>200]);
     }
 
 
