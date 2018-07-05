@@ -27,23 +27,6 @@ class M3gcnController extends BaseController
     }
 
     public function index(){
-        dd(1);
-        //当前页面
-        $menu_id = request()->input('menu_id');
-        $menu = Menu::find($menu_id);
-        //当前页面所有的模块
-        $modules = Menu::where(['type'=>2,'parent_id'=>$menu_id])->get();
-
-        $sql = 'SELECT date(date) as date,sum(`costMoney`) as costMoney
-                  FROM m3ghk_daily_item
-                 WHERE [date=start,date=end] 
-group by date(date)';
-
-        $result = m3ghk_daily_login::query($sql);
-
-
-
-
 
 
 

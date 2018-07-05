@@ -9,7 +9,7 @@
 namespace App\Http\Services;
 
 
-class M3gcnService
+class M3ghkService
 {
 
 }

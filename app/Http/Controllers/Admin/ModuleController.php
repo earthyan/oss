@@ -43,8 +43,8 @@ class ModuleController extends BaseController
      */
     public function addPageAction(Request $request){
         try{
-            $key = //当前游戏的key
-            $product_id = //当前游戏product_id
+            $key = session('product_key');
+            $product_id = session('product_id');//当前游戏product_id
             $parent_id = $request->input('parent_id');
             $page_name = $request->input('page_name');
 
@@ -215,8 +215,6 @@ class ModuleController extends BaseController
         try{
             $menu_id = $request->input('menu_id');//当前的模块
             $menu = Menu::find($menu_id);
-
-
             $new_menu = new Menu();
             $new_menu->product_id = $request->input('product_id');
             $new_menu->parent_id = $request->input('parent_id');
@@ -237,7 +235,7 @@ class ModuleController extends BaseController
         try{
             $version_id = $request->input('version_id');
             $version = ModuleVersion::find($version_id);
-            $version->operation = session('user');//操作人员
+            $version->operation = $request->user()->name;
             $version->action_time = time();
             $version->save();
             return response()->json(['msg'=>'success','code'=>200]);

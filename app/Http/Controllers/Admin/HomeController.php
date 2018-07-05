@@ -9,12 +9,10 @@
 namespace App\Http\Controllers\Admin;
 
 
-use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
 
-class HomeController extends BaseController
+class HomeController extends Controller
 {
     public function __construct()
     {
@@ -35,7 +33,6 @@ class HomeController extends BaseController
         foreach ($products as $product){
             $result[$product['category']][] = $product;
         }
-
         return response()->json(['data'=>$result,'code'=>200]);
     }
 

@@ -23,7 +23,7 @@ Route::get('/test', function () {
 });
 
 Route::get('/test1', function (\Illuminate\Http\Request $request) {
-    var_dump($request->user());
+    var_dump($request->user()->name);
 });
 
 
