@@ -16,11 +16,4 @@ class Menu extends Model
 
     protected $table = 'oss_menu';
 
-
-    public function product(){
-        $this->belongsTo(Product::class,'product_id');
-    }
-
-
-
 }

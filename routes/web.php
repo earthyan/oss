@@ -64,8 +64,8 @@ Route::group(['namespace' => 'Admin'], function () {
         Route::get('/','M3gcnController@index');
 
     });
-
-    Route::get('/','ModuleController@index');
+//
+    Route::get('/module','ModuleController@index');
     Route::get('/addPageAction','ModuleController@addPageAction');
     Route::get('/addOrUpdateModuleView','ModuleController@addOrUpdateModuleView');
     Route::get('/addOrupdateModuleAction','ModuleController@addOrupdateModuleAction');

@@ -10,9 +10,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BaseController;
 use App\Models\Menu;
 use App\Models\ModuleVersion;
+use App\Models\Product;
 use App\Models\SqlConfig;
 use App\Models\SqlWhere;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class ModuleController extends BaseController
 {
@@ -26,14 +27,16 @@ class ModuleController extends BaseController
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(){
-        $menu = Menu::all();
+        $menu = Menu::where(['type'=>1,'product_id'=>session('product_id')])->get();
+        if(empty($menu)){
+            return response()->json(['msg'=>'暂无数据模块','code'=>400]);
+        }
         foreach ($menu as $val){
-            $val['productName'] = ($val['product_id']==0)? '所有游戏':$val->product()->name;
-            if(isset($val['status'])&& $val['status']){
-                $val['state'] = '已发布';
-            }else{
-                $val['state'] = '未发布';
-            }
+            $product = Product::find($val['id']);
+            $val->productName = $product['name'];
+            $val->state = '未发布';
+            isset($val->status) && $val->status && $val->state = '已发布';
+            isset($val->product_id) && $val->product_id==0 && $val->productName = '所有游戏';
         }
         return response()->json($menu);
     }
@@ -47,8 +50,9 @@ class ModuleController extends BaseController
             $menu = new Menu();
             $menu->key = session('product_key');
             $menu->product_id = session('product_id');
-            $menu->parent_id = $request->input('parent_id');
-            $menu->page_name = $request->input('page_name');
+            $menu->parent_id = $request->get('parent_id');
+            $menu->page_name = $request->get('page_name');
+            $menu->module_name = '';
             $menu->type = 1;
             $menu->save();
             return response()->json(['msg'=>'success','code'=>200]);
@@ -174,7 +178,7 @@ class ModuleController extends BaseController
      */
     public function publish(Request $request){
         try{
-            $menuId = $request->input('id');
+            $menuId = $request->input('menu_id');
             $menu = Menu::find($menuId);
             $menu->status = 1;
             $menu->save();
