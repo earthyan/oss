@@ -8,16 +8,17 @@
 
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BaseController;
-use App\Http\Requests\Request;
 use App\Models\Menu;
 use App\Models\ModuleVersion;
 use App\Models\SqlConfig;
 use App\Models\SqlWhere;
+use Illuminate\Support\Facades\Request;
 
 class ModuleController extends BaseController
 {
     public function __construct()
     {
+        parent::__construct();
     }
 
 
@@ -43,16 +44,11 @@ class ModuleController extends BaseController
      */
     public function addPageAction(Request $request){
         try{
-            $key = session('product_key');
-            $product_id = session('product_id');//当前游戏product_id
-            $parent_id = $request->input('parent_id');
-            $page_name = $request->input('page_name');
-
             $menu = new Menu();
-            $menu->key = $key;
-            $menu->product_id = $product_id;
-            $menu->parent_id = $parent_id;
-            $menu->page_name = $page_name;
+            $menu->key = session('product_key');
+            $menu->product_id = session('product_id');
+            $menu->parent_id = $request->input('parent_id');
+            $menu->page_name = $request->input('page_name');
             $menu->type = 1;
             $menu->save();
             return response()->json(['msg'=>'success','code'=>200]);

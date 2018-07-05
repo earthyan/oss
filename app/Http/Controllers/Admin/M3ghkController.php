@@ -22,12 +22,11 @@ class M3ghkController extends BaseController
     private $startDate;
     private $endDate;
     private $connection = "";//需要连接的数据库
+
     public function __construct(M3ghkService $service)
     {
+        parent::__construct();
         $this->service = $service;
-
-        session('product_key',request()->input('product_key'));
-        session('product_id',request()->input('product_id'));
         //默认通配筛选框
         $this->vzoneid = request()->has('vzoneid')? request()->input('vzoneid') : '';//大区
         $this->startDate = request()->has('startDate')? request()->input('startDate') : '';
@@ -36,10 +35,8 @@ class M3ghkController extends BaseController
     }
 
     public function index(){
-
         //当前产品
-        $product_id = '';
-        //当前页面
+        $product_id = session('product_id');
         $menu_id = request()->input('menu_id');
         $menu = Menu::find($menu_id);
         //当前页面所有的模块
@@ -68,19 +65,5 @@ class M3ghkController extends BaseController
         }else{
             return response()->json(['msg'=>'暂无模块，请到配置页面配置相应模块','code'=>400]);
         }
-
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
 }
