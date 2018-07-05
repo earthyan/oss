@@ -65,6 +65,17 @@ Route::group(['namespace' => 'Admin'], function () {
 
     });
 
+    Route::get('/','ModuleController@index');
+    Route::get('/addPageAction','ModuleController@addPageAction');
+    Route::get('/addOrUpdateModuleView','ModuleController@addOrUpdateModuleView');
+    Route::get('/addOrupdateModuleAction','ModuleController@addOrupdateModuleAction');
+    Route::get('/addOrUpdateSqlWhere','ModuleController@addOrUpdateSqlWhere');
+    Route::get('/publish','ModuleController@publish');
+    Route::get('/delete','ModuleController@delete');
+    Route::get('/copy','ModuleController@copy');
+    Route::get('/recover','ModuleController@recover');
+    Route::get('/getModuleSql','ModuleController@getModuleSql');
+
 
 
 

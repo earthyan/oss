@@ -245,7 +245,11 @@ class ModuleController extends BaseController
         }
     }
 
-
+    /**
+     * 获取模块sql
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getModuleSql(Request $request){
         $menuId = $request->input('menu_id');
         $sqlConfig = SqlConfig::where('menu_id',$menuId)->first();

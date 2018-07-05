@@ -16,3 +16,12 @@ function get_menu($product_id){
 
 
 }
+
+
+function getAllMenu(){
+    $menus = \App\Models\Menu::where('type',1)->get();
+    foreach ($menus as $menu){
+        $menu->product_name = $menu->product()->name;
+    }
+    return response()->json($menu);
+}
