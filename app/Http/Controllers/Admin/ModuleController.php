@@ -67,11 +67,11 @@ class ModuleController extends BaseController
         try{
             $data = [];
             if($request->has('id')){
-                $menu_id  = $request->input('id');
-                $menu = Menu::find($menu_id);
+                $menuId  = $request->input('id');
+                $menu = Menu::find($menuId);
                 $method = $menu->method;
                 $sql = SqlConfig::where('method',$method)->first();
-                $version = ModuleVersion::where('menu_id',$menu_id);
+                $version = ModuleVersion::where('menu_id',$menuId);
                 $data = array(
                     'menu'=>$menu,
                     'sql'=>$sql,
@@ -174,8 +174,8 @@ class ModuleController extends BaseController
      */
     public function publish(Request $request){
         try{
-            $menu_id = $request->input('id');
-            $menu = Menu::find($menu_id);
+            $menuId = $request->input('id');
+            $menu = Menu::find($menuId);
             $menu->status = 1;
             $menu->save();
             return response()->json(['msg'=>'success','code'=>200]);
@@ -192,8 +192,8 @@ class ModuleController extends BaseController
      */
     public function delete(Request $request){
         try{
-            $menu_id = $request->input('menu_id');
-            $menu = Menu::find($menu_id);
+            $menuId = $request->input('menu_id');
+            $menu = Menu::find($menuId);
             $menu->delete();
             return response()->json(['msg'=>'success','code'=>200]);
         }catch (\Exception $e){
@@ -209,8 +209,8 @@ class ModuleController extends BaseController
      */
     public function copy(Request $request){
         try{
-            $menu_id = $request->input('menu_id');//当前的模块
-            $menu = Menu::find($menu_id);
+            $menuId = $request->input('menu_id');//当前的模块
+            $menu = Menu::find($menuId);
             $new_menu = new Menu();
             $new_menu->product_id = $request->input('product_id');
             $new_menu->parent_id = $request->input('parent_id');
@@ -226,11 +226,16 @@ class ModuleController extends BaseController
         }
     }
 
-    //恢复历史版本模块
+
+    /****
+     * 恢复历史版本模块
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function recover(Request $request){
         try{
-            $version_id = $request->input('version_id');
-            $version = ModuleVersion::find($version_id);
+            $versionId = $request->input('version_id');
+            $version = ModuleVersion::find($versionId);
             $version->operation = $request->user()->name;
             $version->action_time = time();
             $version->save();
@@ -239,5 +244,19 @@ class ModuleController extends BaseController
             return response()->json(['msg'=>$e->getMessage(),'code'=>$e->getCode()]);
         }
     }
+
+
+    public function getModuleSql(Request $request){
+        $menuId = $request->input('menu_id');
+        $sqlConfig = SqlConfig::where('menu_id',$menuId)->first();
+        if(empty($sqlConfig)){
+            return response()->json(['msg'=>'invalid params','code'=>400]);
+        }
+        return response()->json(['data'=>$sqlConfig['sql'],'code'=>200]);
+    }
+
+
+
+
 
 }
