@@ -35,18 +35,22 @@ class M3ghkController extends BaseController
     }
 
     public function index(){
-        //当前产品
-        $product_id = session('product_id');
+
+        $product_id = session('product_id');//当前产品
         $menu_id = request()->input('menu_id');
         $menu = Menu::find($menu_id);
-        //当前页面所有的模块
-        $modules = Menu::where(['type'=>2,'parent_id'=>$menu_id])->get();
+        //所有模块共有筛选
+
+
+        //当前页面所有的模块 status=1 已发布
+        $modules = Menu::where(['type'=>2,'parent_id'=>$menu_id,'status'=>1])->get();
         if(!empty($modules)){
             $res = [];
             foreach ($modules as $module){
                 $sqlConfig = SqlConfig::where('menu_id',$module['menu_id'])->first();
                 $sql = $sqlConfig['sql'];
                 $head = $sqlConfig['head'];
+                //$sql = sprintf($sql,$args);  这里传参
                 $res = DB::connection($this->connection)->select($sql);//选择不同的数据库来操作
                 $res[] = array(
                     'head'=>$head,
@@ -56,11 +60,14 @@ class M3ghkController extends BaseController
                     'page_name'=>$module['page_name'],
                 );
             }
+
+            //筛选条件
             $sqlWhere = SqlWhere::where('product',$product_id)->get();
             $data = array(
                 'res'=>$res,
                 'sqlWhere'=>$sqlWhere
             );
+
             return response()->json(['data'=>$data,'code'=>200]);
         }else{
             return response()->json(['msg'=>'暂无模块，请到配置页面配置相应模块','code'=>400]);

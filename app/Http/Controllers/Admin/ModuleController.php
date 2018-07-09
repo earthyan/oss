@@ -70,8 +70,8 @@ class ModuleController extends BaseController
     public function addOrUpdateModuleView(Request $request){
         try{
             $data = [];
-            if($request->has('id')){
-                $menuId  = $request->input('id');
+            if($request->has('menu_id')){
+                $menuId  = $request->input('menu_id');
                 $menu = Menu::find($menuId);
                 $method = $menu->method;
                 $sql = SqlConfig::where('method',$method)->first();
@@ -96,17 +96,17 @@ class ModuleController extends BaseController
      */
     public function addOrupdateModuleAction(Request $request){
         try{
-            if($request->has('id')){
-                $menu = Menu::find($request->input('id'));
+            if($request->has('menu_id')){
+                $menu = Menu::find($request->input('menu_id'));
             }else{
                 $menu = new Menu();
             }
-            $menu->product_id = $request->input('product_id');
+            $menu->product_id = session('product_id');
             $menu->parent_id = $request->input('parent_id');
             $menu->page_name = $request->input('page_name');
             $menu->module_name = $request->input('module_name');
             $menu->status = 0;
-            $menu->key = $request->input('key');
+            $menu->key = session('product_key');
             $menu->type = 2; //2 表示模块
             $menu->save();
 
@@ -116,25 +116,17 @@ class ModuleController extends BaseController
             }else{
                 $sqlConfig = new SqlConfig();
             }
-            $sqlConfig->method = $request->input('method');
+            $sqlConfig->menu_id = $menu->id;
             $sqlConfig->sql = $request->input('sql');
-            $sqlConfig->head = json_encode(
-                array(
-                    'key'=>$request->input('key'),
-                    'desc'=>serialize($request->input('desc')),
-                    'type'=>$request->input('type'),
-                    'chart'=>$request->has('chart')?$request->input('chart'):'',
-                    'ext'=>$request->has('ext')? $request->input('ext'):'',
-                ),JSON_UNESCAPED_UNICODE
-            );
+            $sqlConfig->head = $request->input('head');//json 对象
             $sqlConfig->save();
 
             //历史版本
-            $lastest = ModuleVersion::where('menu_id',$request->input('id'))->orderBy('id','DESC')->first();
+            $lastest = ModuleVersion::where('menu_id',$request->input('menu_id'))->latest()->first();
             $version = new ModuleVersion();
-            $version->operation = session('user');//操作人员
+            $version->operation = $request->user()->name;//操作人员
             $version->version = !empty($lastest)? $lastest['version']+1: 0;
-            $version->menu_id = $request->input('id');
+            $version->menu_id = $request->input('menu_id');
             $version->action_time = time();
             $version->save();
             return response()->json(['msg'=>'success','code'=>200]);
@@ -152,7 +144,7 @@ class ModuleController extends BaseController
     public function addOrUpdateSqlWhere(Request $request){
         try{
             if($request->has('id')){
-                $sqlWhere = SqlWhere::find($request->id);
+                $sqlWhere = SqlWhere::find($request->input('id'));
             }else{
                 $sqlWhere = new SqlWhere();
             }
@@ -162,8 +154,22 @@ class ModuleController extends BaseController
             $sqlWhere->return_type = $request->input('return_type');
             $sqlWhere->content = $request->input('content');
             $sqlWhere->explain = $request->input('explain');
-            $sqlWhere->product = $request->input('product');
+            $sqlWhere->product = session('product_id');
             $sqlWhere->save();
+            return response()->json(['msg'=>'success','code'=>200]);
+        }catch (\Exception $e){
+            return response()->json(['msg'=>$e->getMessage(),'code'=>$e->getCode()]);
+        }
+    }
+
+
+    public function delSqlWhere(Request $request){
+        try{
+            $sqlWhere = SqlWhere::find($request->input('id'));
+            if(empty($sqlWhere)){
+                return response()->json(['msg'=>'invalid params','code'=>400]);
+            }
+            $sqlWhere->delete();
             return response()->json(['msg'=>'success','code'=>200]);
         }catch (\Exception $e){
             return response()->json(['msg'=>$e->getMessage(),'code'=>$e->getCode()]);
@@ -180,6 +186,9 @@ class ModuleController extends BaseController
         try{
             $menuId = $request->input('menu_id');
             $menu = Menu::find($menuId);
+            if(empty($menu)){
+                return response()->json(['msg'=>'invalid params','code'=>400]);
+            }
             $menu->status = 1;
             $menu->save();
             return response()->json(['msg'=>'success','code'=>200]);
@@ -198,6 +207,9 @@ class ModuleController extends BaseController
         try{
             $menuId = $request->input('menu_id');
             $menu = Menu::find($menuId);
+            if(empty($menu)){
+                return response()->json(['msg'=>'invalid params','code'=>400]);
+            }
             $menu->delete();
             return response()->json(['msg'=>'success','code'=>200]);
         }catch (\Exception $e){
@@ -215,13 +227,16 @@ class ModuleController extends BaseController
         try{
             $menuId = $request->input('menu_id');//当前的模块
             $menu = Menu::find($menuId);
+            if(empty($menu)){
+                return response()->json(['msg'=>'invalid params','code'=>400]);
+            }
             $new_menu = new Menu();
-            $new_menu->product_id = $request->input('product_id');
+            $new_menu->product_id = session('product_id');
             $new_menu->parent_id = $request->input('parent_id');
             $new_menu->page_name = $menu->page_name;
             $new_menu->module_name = $menu->module_name;
             $new_menu->status = 0;
-            $new_menu->key = $request->input('key');
+            $new_menu->key = session('product_key');
             $new_menu->type = 2; //2 表示模块
             $new_menu->save();
             return response()->json(['msg'=>'success','code'=>200]);
@@ -262,9 +277,5 @@ class ModuleController extends BaseController
         }
         return response()->json(['data'=>$sqlConfig['sql'],'code'=>200]);
     }
-
-
-
-
 
 }
