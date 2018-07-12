@@ -38,7 +38,7 @@ class ModuleController extends BaseController
             isset($val->status) && $val->status && $val->state = '已发布';
             isset($val->product_id) && $val->product_id==0 && $val->productName = '所有游戏';
         }
-        return response()->json($menu);
+        return response()->json(['data'=>$menu,'msg'=>'success','code'=>200]);
     }
 
     /***
@@ -82,7 +82,7 @@ class ModuleController extends BaseController
                     'version'=>$version,
                 );
             }
-            return response()->json($data);
+            return response()->json(['data'=>$data,'code'=>200,'msg'=>'success']);
         }catch (\Exception $e){
             return response()->json(['msg'=>$e->getMessage(),'code'=>$e->getCode()]);
         }
